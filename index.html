@@ -2,168 +2,86 @@
 <html lang="pl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#17324d">
-<title>Wyszukiwarka wykrojników — edycja Excel</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lokalna wyszukiwarka wykrojników</title>
 <style>
-:root{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#182433;background:#f3f6fa}
-*{box-sizing:border-box}body{margin:0}header{background:#17324d;color:white;padding:22px clamp(16px,4vw,40px)}
-h1{margin:0 0 6px;font-size:clamp(1.35rem,3vw,2rem)}header p{margin:0;color:#d9e6f2}
-main{max-width:1400px;margin:0 auto;padding:22px clamp(12px,3vw,28px) 40px}
-.panel{background:white;border:1px solid #dce4ed;border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:0 3px 12px #19324a0a}
-.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-button,.file-label{border:0;border-radius:9px;padding:10px 14px;font-weight:650;cursor:pointer;font-size:.93rem;background:#e8eef5;color:#17324d}
-button.primary{background:#1769aa;color:#fff}button.danger{background:#ffebeb;color:#9b2222}button:disabled{opacity:.45;cursor:not-allowed}
-input,select{font:inherit;padding:10px 11px;border:1px solid #cbd6e2;border-radius:9px;background:white;max-width:100%}
-input[type=file]{display:none}.file-label{display:inline-flex;align-items:center}
-#search{flex:1;min-width:210px}#status{font-size:.92rem;color:#536579;margin-top:10px}
-.note{font-size:.9rem;color:#526477;line-height:1.5}.table-wrap{overflow:auto;max-height:62vh;border:1px solid #dce4ed;border-radius:10px}
-table{border-collapse:separate;border-spacing:0;width:100%;min-width:650px;font-size:.92rem}
-th,td{padding:0;border-bottom:1px solid #e6ebf1;border-right:1px solid #edf0f4;text-align:left;vertical-align:top}
-th{position:sticky;top:0;background:#eaf0f6;z-index:1;padding:11px 10px;white-space:nowrap}
-td input{width:100%;border:0;border-radius:0;padding:10px;background:transparent;min-width:100px}
-td input:focus{outline:2px solid #77b7ef;outline-offset:-2px;background:#f7fbff}
-td.actions{padding:5px;white-space:nowrap}td.actions button{padding:7px 9px}
-.empty{padding:28px;text-align:center;color:#607184}
-.badge{display:inline-block;padding:4px 8px;border-radius:99px;background:#e8f5ec;color:#24643a;font-size:.8rem;font-weight:700}
-@media(max-width:600px){header{padding:18px 15px}.panel{padding:12px}.toolbar button,.file-label{flex-grow:1;justify-content:center}}
+:root{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#1f2937;background:#f4f6f8}
+body{margin:0;padding:22px}main{max-width:1200px;margin:auto}.panel{background:white;border:1px solid #dbe1e8;border-radius:12px;padding:18px;margin:14px 0;box-shadow:0 2px 7px #0f172a0a}
+h1{margin:0 0 6px;font-size:26px}p{color:#526071;margin:6px 0 12px}.controls{display:grid;grid-template-columns:repeat(4,minmax(140px,1fr));gap:10px}
+label{display:block;font-size:13px;font-weight:650;margin-bottom:5px}input{box-sizing:border-box;width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:7px;font:inherit}
+button,.filebtn{border:0;border-radius:7px;padding:10px 13px;background:#155eef;color:white;font-weight:650;cursor:pointer;font:inherit}button.secondary,.filebtn.secondary{background:#e8edf4;color:#243247}button.danger{background:#b42318}button:disabled{opacity:.5;cursor:not-allowed}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
+.stats{display:flex;gap:18px;flex-wrap:wrap;color:#475467;font-size:14px}.tablewrap{overflow:auto;max-height:60vh;border:1px solid #e2e8f0;border-radius:8px}
+table{border-collapse:collapse;width:100%;min-width:760px;background:white}th,td{text-align:left;padding:10px 12px;border-bottom:1px solid #e8edf2;vertical-align:top}th{position:sticky;top:0;background:#eef2f7;z-index:1}td.index{font-weight:700;color:#174ea6;white-space:nowrap}tr:hover td{background:#f8fbff}.empty{text-align:center;color:#667085;padding:24px}
+.formgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.note{font-size:13px;color:#667085}.hidden{display:none!important}.pill{background:#e8f2ff;color:#174ea6;border-radius:20px;padding:3px 8px;font-size:12px}
+@media(max-width:760px){body{padding:10px}.controls,.formgrid{grid-template-columns:1fr 1fr}h1{font-size:22px}}@media(max-width:480px){.controls,.formgrid{grid-template-columns:1fr}}
 </style>
 </head>
-<body>
-<header>
-  <h1>Wyszukiwarka wykrojników</h1>
-  <p>Dodawaj i poprawiaj dane z Excela, a następnie pobierz zaktualizowany plik.</p>
-</header>
-<main>
-  <section class="panel">
-    <div class="toolbar">
-      <label class="file-label primary" for="file">📂 Wczytaj plik Excel</label>
-      <input id="file" type="file" accept=".xlsx,.xls,.csv">
-      <button id="addRow" disabled>＋ Dodaj wiersz</button>
-      <button id="addCol" disabled>＋ Dodaj kolumnę</button>
-      <button id="export" class="primary" disabled>⬇ Pobierz Excel</button>
-      <button id="reset" disabled>Wyczyść dane</button>
-    </div>
-    <p class="note">Wybierz plik .xlsx, .xls lub .csv z komputera. Komórki możesz edytować bezpośrednio w tabeli. Dodane lub zmienione dane zapamiętują się w tej przeglądarce, ale aby zapisać je do pliku, kliknij <b>„Pobierz Excel”</b>. Oryginalny plik nie jest modyfikowany.</p>
-    <div id="status" role="status">Nie wczytano jeszcze pliku. Wybierz swój arkusz Excel, aby rozpocząć.</div>
-  </section>
-
-  <section class="panel" id="dataPanel">
-    <div class="toolbar" style="margin-bottom:12px">
-      <input id="search" type="search" placeholder="Szukaj po numerze wykrojnika, regale, półce…" disabled>
-      <label class="note" for="sheetSelect">Arkusz:</label>
-      <select id="sheetSelect" disabled></select>
-    </div>
-    <div class="table-wrap" id="tableWrap">
-      <div class="empty">Po wczytaniu Excela dane pojawią się tutaj.</div>
-    </div>
-  </section>
-  <section class="panel">
-    <b>Ważne</b>
-    <p class="note">Ta strona edytuje lokalną kopię danych w przeglądarce. Nie zapisuje zmian automatycznie do repozytorium GitHub ani do wspólnego pliku Excel. Po edycji pobierz nowy plik i użyj go jako aktualnej wersji danych. Jeśli chcesz, aby wszyscy użytkownicy widzieli te same zmiany, potrzebna będzie wspólna baza danych lub inny mechanizm synchronizacji.</p>
-  </section>
+<body><main>
+<header><h1>Wyszukiwarka wykrojników</h1><p>Wersja lokalna — bez konta i bez połączenia z internetem. Kolumna <b>Index</b> jest widoczna w tabeli.</p></header>
+<section class="panel">
+<h2>Wyszukiwanie</h2>
+<div class="controls">
+<div><label for="q">Szukaj (symbol, index, regał)</label><input id="q" placeholder="np. K-121, symbol, numer regału"></div>
+<div><label for="qIndex">Index</label><input id="qIndex" placeholder="Filtruj po indexie"></div>
+<div><label for="qSymbol">Symbol</label><input id="qSymbol" placeholder="Filtruj po symbolu"></div>
+<div><label for="qRack">Nr regału</label><input id="qRack" placeholder="Filtruj po regale"></div>
+</div>
+<div class="actions"><button id="clear" class="secondary">Wyczyść filtry</button><button id="new">+ Dodaj wykrojnik</button></div>
+<div class="stats" style="margin-top:12px"><span id="count">0 wyników</span><span id="total"></span><span class="note" id="saveState">Zmiany zapisywane w tej przeglądarce.</span></div>
+</section>
+<section class="panel hidden" id="editor">
+<h2 id="editorTitle">Dodaj wykrojnik</h2>
+<div class="formgrid">
+<div><label for="fRack">Nr regału</label><input id="fRack"></div>
+<div><label for="fSymbol">Symbol</label><input id="fSymbol"></div>
+<div><label for="fIndex">Index</label><input id="fIndex"></div>
+</div>
+<div class="actions"><button id="save">Zapisz</button><button id="cancel" class="secondary">Anuluj</button></div>
+</section>
+<section class="panel">
+<h2>Wykrojniki</h2>
+<div class="tablewrap"><table><thead><tr><th>Nr regału</th><th>Symbol</th><th>Index</th><th>Akcje</th></tr></thead><tbody id="rows"></tbody></table></div>
+<p class="note">Kliknij „Edytuj”, aby zmienić rekord. Usuwanie i edycja dotyczą lokalnej kopii danych.</p>
+</section>
+<section class="panel">
+<h2>Import, eksport i kopia zapasowa</h2>
+<p>Eksportuj CSV do arkusza kalkulacyjnego albo zapisz pełną kopię zapasową. Import CSV obsługuje kolumny: Nr regału, Symbol, Index.</p>
+<div class="actions">
+<button id="export">Eksport CSV</button>
+<label class="filebtn secondary" for="importCsv">Import CSV</label><input class="hidden" id="importCsv" type="file" accept=".csv,text/csv">
+<button id="backup" class="secondary">Pobierz kopię JSON</button>
+<label class="filebtn secondary" for="restoreJson">Przywróć kopię JSON</label><input class="hidden" id="restoreJson" type="file" accept=".json,application/json">
+<button id="reset" class="danger">Przywróć dane początkowe</button>
+</div><p class="note">Dane są przechowywane tylko w tej przeglądarce na tym urządzeniu. Wyczyść dane przeglądarki lub użyj innego urządzenia — dane mogą nie być dostępne. Rób kopie zapasowe.</p>
+</section>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
-(() => {
-  const $ = id => document.getElementById(id);
-  const fileInput=$('file'), searchInput=$('search'), sheetSelect=$('sheetSelect');
-  let workbook=null, currentSheet='', data=[], headers=[], originalName='wykrojniki.xlsx';
-  const storeKey='wykrojniki_excel_editor_v1';
-  function setEnabled(on){
-    ['addRow','addCol','export','reset','search','sheetSelect'].forEach(id=>$(id).disabled=!on);
-  }
-  function status(message){$('status').textContent=message;}
-  function safeText(v){return v==null?'':String(v);}
-  function render(){
-    if(!workbook){$('tableWrap').innerHTML='<div class="empty">Po wczytaniu Excela dane pojawią się tutaj.</div>';return;}
-    const term=searchInput.value.trim().toLocaleLowerCase('pl');
-    const visible=data.map((row,i)=>({row,i})).filter(({row})=>!term||row.some(v=>safeText(v).toLocaleLowerCase('pl').includes(term)));
-    const table=document.createElement('table');
-    const thead=document.createElement('thead'), trh=document.createElement('tr');
-    headers.forEach(h=>{const th=document.createElement('th');th.textContent=h;trh.appendChild(th);});
-    const thActions=document.createElement('th');thActions.textContent='Akcje';trh.appendChild(thActions);thead.appendChild(trh);table.appendChild(thead);
-    const tbody=document.createElement('tbody');
-    visible.forEach(({row,index})=>{
-      const tr=document.createElement('tr');
-      headers.forEach((h,col)=>{
-        const td=document.createElement('td'), input=document.createElement('input');
-        input.value=safeText(row[col]);input.setAttribute('aria-label',h+' — wiersz '+(index+1));
-        input.addEventListener('change',()=>{data[index][col]=input.value;persist();});
-        td.appendChild(input);tr.appendChild(td);
-      });
-      const td=document.createElement('td');td.className='actions';
-      const del=document.createElement('button');del.className='danger';del.textContent='Usuń';
-      del.title='Usuń ten wiersz';del.addEventListener('click',()=>{
-        if(confirm('Usunąć ten wiersz?')){data.splice(index,1);persist();render();status('Usunięto wiersz. Pobierz Excel, aby zapisać zmiany w pliku.');}
-      });
-      td.appendChild(del);tr.appendChild(td);tbody.appendChild(tr);
-    });
-    if(!visible.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=headers.length+1;td.className='empty';td.textContent='Brak wyników dla tego wyszukiwania.';tr.appendChild(td);tbody.appendChild(tr);}
-    table.appendChild(tbody);
-    const wrap=$('tableWrap');wrap.replaceChildren(table);
-    status('Arkusz: '+currentSheet+' · Wiersze: '+data.length+' · Widoczne: '+visible.length+' · Kolumny: '+headers.length);
-  }
-  function persist(){
-    try{localStorage.setItem(storeKey,JSON.stringify({sheet:currentSheet,headers,data,originalName}));}catch(e){}
-  }
-  function refreshSheetNames(selected){
-    sheetSelect.replaceChildren();
-    workbook.SheetNames.forEach(name=>{const o=document.createElement('option');o.value=name;o.textContent=name;sheetSelect.appendChild(o);});
-    sheetSelect.value=selected||workbook.SheetNames[0];
-  }
-  function loadSheet(name){
-    currentSheet=name;
-    const ws=workbook.Sheets[name];
-    const matrix=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false});
-    headers=(matrix.shift()||[]).map((h,i)=>safeText(h).trim()||('Kolumna '+(i+1)));
-    if(!headers.length) headers=['Regał','Półka','Numer wykrojnika','Opis'];
-    data=matrix.filter(row=>row.some(v=>safeText(v).trim()!=='')).map(row=>headers.map((_,i)=>safeText(row[i])));
-    data=data.map(row=>{while(row.length<headers.length)row.push('');return row.slice(0,headers.length);});
-    searchInput.value='';
-    setEnabled(true);persist();render();
-  }
-  fileInput.addEventListener('change',async()=>{
-    const file=fileInput.files[0];if(!file)return;
-    try{
-      const buf=await file.arrayBuffer();
-      workbook=XLSX.read(buf,{type:'array'});
-      originalName=file.name.replace(/\.(xlsx|xls|csv)$/i,'')+'_edytowany.xlsx';
-      refreshSheetNames();loadSheet(workbook.SheetNames[0]);
-      status('Wczytano plik: '+file.name+'. Możesz edytować komórki, dodawać wiersze i kolumny.');
-    }catch(err){status('Nie udało się odczytać pliku. Sprawdź, czy to prawidłowy Excel (.xlsx, .xls) lub CSV.');}
-  });
-  sheetSelect.addEventListener('change',()=>{if(!workbook)return;loadSheet(sheetSelect.value);});
-  searchInput.addEventListener('input',render);
-  $('addRow').addEventListener('click',()=>{
-    data.push(headers.map(()=>''));persist();render();
-    const wrap=$('tableWrap');wrap.scrollTop=wrap.scrollHeight;
-    status('Dodano pusty wiersz. Wpisz dane w komórkach i pobierz Excel.');
-  });
-  $('addCol').addEventListener('click',()=>{
-    const name=prompt('Podaj nazwę nowej kolumny (np. Regał, Półka, Uwagi):');
-    if(!name||!name.trim())return;
-    if(headers.some(h=>h.toLocaleLowerCase('pl')===name.trim().toLocaleLowerCase('pl'))){alert('Kolumna o takiej nazwie już istnieje.');return;}
-    headers.push(name.trim());data.forEach(row=>row.push(''));persist();render();
-  });
-  $('export').addEventListener('click',()=>{
-    if(!workbook)return;
-    const ws=XLSX.utils.aoa_to_sheet([headers,...data]);
-    workbook.Sheets[currentSheet]=ws;
-    // Preserve other sheets from the uploaded workbook where possible.
-    workbook.SheetNames.forEach(name=>{if(name!==currentSheet && !workbook.Sheets[name])workbook.Sheets[name]={};});
-    const out=XLSX.write(workbook,{bookType:'xlsx',type:'array'});
-    const blob=new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-    const url=URL.createObjectURL(blob), a=document.createElement('a');
-    a.href=url;a.download=originalName;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
-    status('Przygotowano zaktualizowany plik Excel do pobrania.');
-  });
-  $('reset').addEventListener('click',()=>{
-    if(confirm('Wyczyścić tabelę z bieżącego arkusza? Ta operacja nie zmienia oryginalnego pliku.')){
-      data=[];persist();render();status('Wyczyszczono dane bieżącego arkusza.');
-    }
-  });
-})();
-</script>
-</body>
-</html>
+const initialData = [{"rack": "1", "symbol": "P042859", "index": "O-K-121-0068"}, {"rack": "2", "symbol": "P044392", "index": "O-K-033-0093"}, {"rack": "3", "symbol": "P038667", "index": "O-K-246-0010"}, {"rack": "4", "symbol": "P034356", "index": "O-K-182-0029"}, {"rack": "5", "symbol": "P037357", "index": "O-K-046-0001"}, {"rack": "6", "symbol": "P030712", "index": "O-K-131-0001"}, {"rack": "7", "symbol": "P034054", "index": "O-K-079-0006"}, {"rack": "8", "symbol": "F250514031", "index": "O-K-121-0064"}, {"rack": "9", "symbol": "P032597", "index": "O-K-182-0022"}, {"rack": "10", "symbol": "P045846", "index": "O-K-248-0012"}, {"rack": "11", "symbol": "F221031060", "index": "O-K-033-0068"}, {"rack": "12", "symbol": "F220610002", "index": "O-K-033-0066"}, {"rack": "13", "symbol": "P039933", "index": "O-K-129-0019"}, {"rack": "14", "symbol": "F220112056", "index": "O-K-041-0012"}, {"rack": "15", "symbol": "F221108037", "index": "O-K-129-0011"}, {"rack": "16", "symbol": "F230315045", "index": "O-K-185-0015"}, {"rack": "17", "symbol": "P042860", "index": "O-K-121-0067"}, {"rack": "18", "symbol": "P035410", "index": "O-K-032-0025"}, {"rack": "19", "symbol": "F221108034", "index": "O-K-129-0012"}, {"rack": "20", "symbol": "P042016", "index": "O-K-159-0025"}, {"rack": "21", "symbol": "P036597", "index": "O-K-217-0005"}, {"rack": "22", "symbol": "F220728056", "index": "O-K-032-0020"}, {"rack": "23", "symbol": "F221212013", "index": "O-K-047-0001"}, {"rack": "24", "symbol": "P042020", "index": "O-K-159-0029"}, {"rack": "25", "symbol": "P042018", "index": "O-K-159-0027"}, {"rack": "26", "symbol": "P042017", "index": "O-K-159-0026"}, {"rack": "27", "symbol": "P032055", "index": "O-K-137-0006"}, {"rack": "28", "symbol": "P044883", "index": "O-K-121-0073"}, {"rack": "29", "symbol": "P045319", "index": "O-K-121-0080"}, {"rack": "30", "symbol": "A126025380", "index": "O-K-298-0003"}, {"rack": "31", "symbol": "P042634", "index": "O-K-190-0017"}, {"rack": "32", "symbol": "A126025366", "index": "O-K-289-0002"}, {"rack": "33", "symbol": "F230116027", "index": "O-K-184-0017"}, {"rack": "34", "symbol": "F230116029", "index": "O-K-184-0016"}, {"rack": "35", "symbol": "F230124062", "index": "O-K-096-0005"}, {"rack": "36", "symbol": "P042019", "index": "O-K-159-0028"}, {"rack": "37", "symbol": "P042227", "index": "O-K-190-0014"}, {"rack": "38", "symbol": "A126015503", "index": "O-K-290-0005"}, {"rack": "39", "symbol": "P045560", "index": "O-K-046-0011"}, {"rack": "40", "symbol": "P029500", "index": "O-K-033-0070"}, {"rack": "41", "symbol": "P032163", "index": "O-K-016-0008"}, {"rack": "42", "symbol": "P031010", "index": "O-K-019-0011"}, {"rack": "43", "symbol": "P032593", "index": "O-K-065-0011"}, {"rack": "44", "symbol": "A126013072", "index": "O-K-290-0002"}, {"rack": "45", "symbol": "A126013709", "index": "O-K-293-0001"}, {"rack": "46", "symbol": "P035027", "index": "O-K-202-0006"}, {"rack": "47", "symbol": "F240429085", "index": "O-K-121-0047"}, {"rack": "48", "symbol": "P033554", "index": "O-K-182-0026"}, {"rack": "49", "symbol": "P032595", "index": "O-K-182-0021"}, {"rack": "50", "symbol": "P039627", "index": "O-K-033-0081"}, {"rack": "51", "symbol": "P041695", "index": "O-K-041-0023"}, {"rack": "52", "symbol": "P038071", "index": "O-K-121-0027"}, {"rack": "53", "symbol": "P044663", "index": "O-K-226-0012"}, {"rack": "54", "symbol": "F220323061", "index": "O-K-024-0003"}, {"rack": "55", "symbol": "F240904012", "index": "O-K-182-0064"}, {"rack": "56", "symbol": "P045747", "index": "O-K-047-0007"}, {"rack": "57", "symbol": "P033834", "index": "O-K-016-0011"}, {"rack": "58", "symbol": "A120014770", "index": "O-K-137-0002"}, {"rack": "59", "symbol": "P042635", "index": "O-K-190-0016"}, {"rack": "60", "symbol": "P041635", "index": "O-K-056-0012"}, {"rack": "61", "symbol": "F240429090", "index": "O-K-121-0053"}, {"rack": "62", "symbol": "A126013037", "index": "O-K-202-0009"}, {"rack": "63", "symbol": "P042315", "index": "O-K-121-0059"}, {"rack": "64", "symbol": "P042925", "index": "O-K-173-0019"}, {"rack": "65", "symbol": "A126013358", "index": "O-K-292-0001"}, {"rack": "66", "symbol": "F220728057", "index": "O-K-032-0021"}, {"rack": "67", "symbol": "P035776", "index": "O-K-129-0008"}, {"rack": "68", "symbol": "F230314003", "index": "O-K-190-0007"}, {"rack": "69", "symbol": "F230324043", "index": "O-K-046-0003"}, {"rack": "70", "symbol": "P042378", "index": "O-K-121-0060"}, {"rack": "71", "symbol": "A126013077", "index": "O-K-290-0003"}, {"rack": "72", "symbol": "A126009454", "index": "O-K-182-0005"}, {"rack": "73", "symbol": "P039683", "index": "O-K-033-0086"}, {"rack": "74", "symbol": "P029477", "index": "O-K-033-0004"}, {"rack": "75", "symbol": "F230713018", "index": "O-K-190-0009"}, {"rack": "76", "symbol": "P033906", "index": "O-K-063-0011"}, {"rack": "77", "symbol": "P038160", "index": "PRAWDOPODOBNIE K80 ESTER ERIK"}, {"rack": "78", "symbol": "P035001", "index": "O-K-082-0014"}, {"rack": "79", "symbol": "P033835", "index": "O-K-016-0012"}, {"rack": "80", "symbol": "P032269", "index": "ETAC UTYLIZACJA"}, {"rack": "81", "symbol": "F220621007", "index": "CREATIVE BOX"}, {"rack": "82", "symbol": "P042426", "index": "O-K-041-0026"}, {"rack": "83", "symbol": "P031470", "index": "O-K-165-0002"}, {"rack": "84", "symbol": "P042615", "index": "O-K-128-0006"}, {"rack": "85", "symbol": "P040750", "index": "O-K-033-0089"}, {"rack": "86", "symbol": "A126017231", "index": "O-K-248-0010"}, {"rack": "87", "symbol": "P042357", "index": "O-K-001-0069"}, {"rack": "88", "symbol": "P033709", "index": "O-K-033-0039"}, {"rack": "89", "symbol": "P033000", "index": "O-K-182-0044"}, {"rack": "90", "symbol": "P033493", "index": "O-K-033-0035"}, {"rack": "91", "symbol": "A126013038", "index": "O-K-202-0010"}, {"rack": "92", "symbol": "A126014191", "index": "O-K-075-0018"}, {"rack": "93", "symbol": "F220226007", "index": "O-K-033-0050"}, {"rack": "94", "symbol": "P031595", "index": "O-K-202-0002"}, {"rack": "95", "symbol": "P042621", "index": "O-K-128-0007"}, {"rack": "96", "symbol": "P042858", "index": "O-K-202-0008"}, {"rack": "97", "symbol": "F240403002", "index": "O-K-033-0082"}, {"rack": "98", "symbol": "P042610", "index": "O-K-128-0005"}, {"rack": "99", "symbol": "P034047", "index": "O-K-091-0002"}, {"rack": "100", "symbol": "P030875", "index": "O-K-031-0014"}, {"rack": "101", "symbol": "P032191", "index": "O-K-033-0040"}, {"rack": "102", "symbol": "A126021926", "index": "O-K-226-0014"}, {"rack": "103", "symbol": "A126011190", "index": "O-K-290-0001"}, {"rack": "104", "symbol": "F230112024", "index": "O-K-158-0001"}, {"rack": "105", "symbol": "F220412022", "index": "O-K-033-0060"}, {"rack": "106", "symbol": "P033622", "index": "O-K-033-0034"}, {"rack": "107", "symbol": "P042626", "index": "O-K-190-0015"}, {"rack": "108", "symbol": "A126013708", "index": "O-K-293-0002"}, {"rack": "109", "symbol": "P039740", "index": "O-K-186-0004"}, {"rack": "110", "symbol": "P030895", "index": "O-K-016-0006"}, {"rack": "111", "symbol": "F250514037", "index": "O-K-121-0065"}, {"rack": "112", "symbol": "F230731033", "index": "O-K-094-0002"}, {"rack": "113", "symbol": "P042366", "index": "O-K-001-0070"}, {"rack": "114", "symbol": "A126017756", "index": "O-K-293-0003"}, {"rack": "115", "symbol": "P040749", "index": "O-K-033-0091"}, {"rack": "116", "symbol": "P042206", "index": "O-K-145-0013"}, {"rack": "117", "symbol": "P042015", "index": "O-K-159-0024"}, {"rack": "118", "symbol": "P039147", "index": "O-K-244-0010"}, {"rack": "119", "symbol": "F220608029", "index": "O-K-033-0064"}, {"rack": "120", "symbol": "P033552", "index": "O-K-182-0025"}, {"rack": "121", "symbol": "A121005240", "index": "O-K-000-0000"}, {"rack": "122", "symbol": "P039397", "index": "O-K-217-0006"}, {"rack": "123", "symbol": "P034824", "index": "O-K-182-0037"}, {"rack": "124", "symbol": "P032973", "index": "PAPERPACK"}, {"rack": "125", "symbol": "F240430060", "index": "O-K-121-0050"}, {"rack": "126", "symbol": "P029593", "index": "O-K-182-0001"}, {"rack": "127", "symbol": "F220628056", "index": "O-K-134-0001"}, {"rack": "128", "symbol": "A126017762", "index": "O-K-293-0004"}, {"rack": "129", "symbol": "P044946", "index": "O-K-121-0076"}, {"rack": "130", "symbol": "P044260", "index": "O-K-226-0011"}, {"rack": "131", "symbol": "P031410", "index": "O-K-182-0016"}, {"rack": "132", "symbol": "A230107012", "index": "O-K-052-0004"}, {"rack": "133", "symbol": "P034190", "index": "O-K-012-0002"}, {"rack": "134", "symbol": "F220519006", "index": "O-K-200-0042"}, {"rack": "135", "symbol": "F220226003", "index": "O-K-033-051"}, {"rack": "136", "symbol": "P037131", "index": "O-K-217-0001"}, {"rack": "137", "symbol": "A126025375", "index": "O-K-298-0001"}, {"rack": "138", "symbol": "P043865", "index": "O-K-128-0021"}, {"rack": "139", "symbol": "P042878", "index": "O-K-046-0007"}, {"rack": "140", "symbol": "P039954", "index": "O-K-033-0078"}, {"rack": "141", "symbol": "P032107", "index": "O-K-065-0008"}, {"rack": "142", "symbol": "P038499", "index": "O-K-232-0001"}, {"rack": "143", "symbol": "P034823", "index": "O-K-182-0036"}, {"rack": "144", "symbol": "P044514", "index": "O-K-121-0075"}, {"rack": "145", "symbol": "P038653", "index": "O-K-182-0050"}, {"rack": "146", "symbol": "F220629017", "index": "O-K-194-0005"}, {"rack": "147", "symbol": "P044515", "index": "O-K-121-0071"}, {"rack": "148", "symbol": "F251022015", "index": "O-K-128-0044"}, {"rack": "149", "symbol": "F251114017", "index": "O-K-128-0028"}, {"rack": "150", "symbol": "F251021001", "index": "O-K-128-0029"}, {"rack": "151", "symbol": "P040577", "index": "O-K-033-0087"}, {"rack": "152", "symbol": "P044137", "index": "O-K-121-0072"}, {"rack": "153", "symbol": "P037354", "index": "O-K-046-0004"}, {"rack": "154", "symbol": "P033638", "index": "O-K-033-0033"}, {"rack": "155", "symbol": "P036148", "index": "DANHOSS"}, {"rack": "156", "symbol": "P007209", "index": "O-K-018-0001"}, {"rack": "157", "symbol": "F220823004", "index": "O-K-054-0004"}, {"rack": "158", "symbol": "F231104008", "index": "O-K-015-0002"}, {"rack": "159", "symbol": "P044692", "index": "O-K-190-0025"}, {"rack": "160", "symbol": "P032823", "index": "O-K-033-0032"}, {"rack": "161", "symbol": "P032271", "index": "O-K-023-0006"}, {"rack": "162", "symbol": "F230420027", "index": "O-K-075-0010"}, {"rack": "163", "symbol": "P040545", "index": "O-K-121-0051"}, {"rack": "164", "symbol": "F211222058", "index": "O-K-041-0009"}, {"rack": "165", "symbol": "P032252", "index": "O-K-049-0004"}, {"rack": "166", "symbol": "F220519010", "index": "O-K-200-0043"}, {"rack": "167", "symbol": "P044390", "index": "O-K-033-0095"}, {"rack": "168", "symbol": "P034893", "index": "O-K-165-0005"}, {"rack": "169", "symbol": "P033656", "index": "O-K-065-0015"}, {"rack": "170", "symbol": "P044909", "index": "O-K-248-0008"}, {"rack": "171", "symbol": "P033881", "index": "O-K-065-0032"}, {"rack": "172", "symbol": "P039477", "index": "O-K-121-0042"}, {"rack": "173", "symbol": "F211217043", "index": "O-K-041-0010"}, {"rack": "174", "symbol": "P033840", "index": "O-K-028-0021"}, {"rack": "175", "symbol": "F230517045", "index": "O-K-121-0028"}, {"rack": "176", "symbol": "P044391", "index": "O-K-033-0096"}, {"rack": "177", "symbol": "P044389", "index": "O-K-033-0094"}, {"rack": "178", "symbol": "P034357", "index": "O-K-182-0030"}, {"rack": "179", "symbol": "P036286", "index": "O-K-190-0002"}, {"rack": "180", "symbol": "P031598", "index": "O-K-202-0003"}, {"rack": "181", "symbol": "P036288", "index": "O-K-190-0003"}, {"rack": "182", "symbol": "P039991", "index": "O-K-084-0041"}, {"rack": "183", "symbol": "P045394", "index": "O-K-121-0081"}, {"rack": "184", "symbol": "P032562", "index": "O-K-075-0005"}, {"rack": "185", "symbol": "P044333", "index": "O-K-190-0022"}, {"rack": "186", "symbol": "P039847", "index": "VIOLA"}, {"rack": "187", "symbol": "P043476", "index": "O-K-283-0001"}, {"rack": "188", "symbol": "P032267", "index": "ETAC"}, {"rack": "189", "symbol": "P043550", "index": "O-K-128-0045"}, {"rack": "190", "symbol": "P030714", "index": "O-K-182-0010"}, {"rack": "191", "symbol": "P036306", "index": "O-K-016-0014"}, {"rack": "192", "symbol": "P031776", "index": "O-K-182-0034"}, {"rack": "193", "symbol": "P044023", "index": "O-K-128-0025"}, {"rack": "194", "symbol": "F220629019", "index": "O-K-190-0004"}, {"rack": "195", "symbol": "F221208039", "index": "O-K-185-0009"}, {"rack": "196", "symbol": "P038670", "index": "O-K-182-0047"}, {"rack": "197", "symbol": "F230526059", "index": "O-K-226-0013"}, {"rack": "198", "symbol": "P038653", "index": "O-K-182-0050"}, {"rack": "199", "symbol": "F221208036", "index": "O-K-185-0008"}, {"rack": "200", "symbol": "P037002", "index": "O-K-186-0001"}, {"rack": "201", "symbol": "F230315039", "index": "O-K-184-0018"}, {"rack": "202", "symbol": "F230209061", "index": "O-K-185-0013"}, {"rack": "203", "symbol": "F230330065", "index": "O-K-159-0014"}, {"rack": "204", "symbol": "P038571", "index": "O-K-226-0007"}, {"rack": "205", "symbol": "F221208038", "index": "O-K-185-0007"}, {"rack": "206", "symbol": "P038671", "index": "O-K-182-0048"}, {"rack": "207", "symbol": "P038655", "index": "O-K-182-0051"}, {"rack": "208", "symbol": "P035368", "index": "O-K-056-0002"}, {"rack": "209", "symbol": "P042511", "index": "O-K-001-0073"}, {"rack": "210", "symbol": "F230621012", "index": "O-K-004-0002"}, {"rack": "211", "symbol": "P037008", "index": "O-K-047-0002"}, {"rack": "212", "symbol": "F230621012", "index": "O-K-004-0002"}, {"rack": "213", "symbol": "F230315003", "index": "O-K-121-0022"}, {"rack": "214", "symbol": "P038481", "index": "O-K-118-0030"}, {"rack": "215", "symbol": "F230324036", "index": "O-K-159-0015"}, {"rack": "216", "symbol": "P043469", "index": "O-K-281-0003"}, {"rack": "217", "symbol": "F231005029", "index": "O-K-230-0002"}, {"rack": "218", "symbol": "P043877", "index": "O-K-118-0035"}, {"rack": "219", "symbol": "P043810", "index": "O-K-046-0009"}, {"rack": "220", "symbol": "F230531019", "index": "O-K-230-0001"}, {"rack": "221", "symbol": "P043615", "index": "O-K-128-0041"}, {"rack": "222", "symbol": "P043551", "index": "O-K-128-0014"}, {"rack": "223", "symbol": "P037347", "index": "O-K-046-0002"}, {"rack": "224", "symbol": "P036661", "index": "O-K-075-0013"}, {"rack": "225", "symbol": "F231104004", "index": "O-K-015-0006"}, {"rack": "226", "symbol": "F230814005", "index": "SUDER"}, {"rack": "227", "symbol": "P043715", "index": "O-K-128-0018"}, {"rack": "228", "symbol": "F230726004", "index": "O-K-121-0034"}, {"rack": "229", "symbol": "P043473", "index": "O-K-281-0002"}, {"rack": "230", "symbol": "F221207027", "index": "O-K-226-0010"}, {"rack": "231", "symbol": "P040169", "index": "O-K-033-0084"}, {"rack": "232", "symbol": "P037359", "index": "O-K-047-0003"}, {"rack": "233", "symbol": "P039908", "index": "O-K-182-0057"}, {"rack": "234", "symbol": "P041696", "index": "O-K-041-0024"}, {"rack": "235", "symbol": "F240410065", "index": "O-K-182-0058"}, {"rack": "236", "symbol": "P039432", "index": "O-K-182-0052"}, {"rack": "237", "symbol": "F240307032", "index": "O-K-121-0061"}, {"rack": "238", "symbol": "P040088", "index": "O-K-190-0011"}, {"rack": "239", "symbol": "F230523056", "index": "O-K-190-0008"}, {"rack": "240", "symbol": "P044145", "index": "O-K-128-0032"}, {"rack": "241", "symbol": "P040170", "index": "O-K-033-0083"}, {"rack": "242", "symbol": "F230713068", "index": "O-K-084-0016"}, {"rack": "243", "symbol": "P043474", "index": "O-K-281-0001"}, {"rack": "244", "symbol": "P037360", "index": "O-K-047-0004"}, {"rack": "245", "symbol": "F231102035", "index": "O-K-093-0005"}, {"rack": "246", "symbol": "P044660", "index": "O-K-041-0027"}, {"rack": "247", "symbol": "F240306069", "index": "O-K-046-0006"}, {"rack": "248", "symbol": "P037356", "index": "O-K-047-0006"}, {"rack": "249", "symbol": "F230403003", "index": "O-K-219-0001"}, {"rack": "250", "symbol": "F240507005", "index": "O-K-121-0046"}, {"rack": "251", "symbol": "F240410068", "index": "O-K-182-0060"}, {"rack": "252", "symbol": "P040837", "index": "O-K-001-0067"}, {"rack": "253", "symbol": "F231115032", "index": "O-K-121-0038"}, {"rack": "254", "symbol": "P039339", "index": "O-K-121-0039"}, {"rack": "255", "symbol": "P039149", "index": "O-K-244-0012"}, {"rack": "256", "symbol": "P045404", "index": "O-K-128-0039"}, {"rack": "257", "symbol": "P039148", "index": "O-K-244-0011"}, {"rack": "258", "symbol": "F231104005", "index": "O-K-015-0008"}, {"rack": "259", "symbol": "F240108051", "index": "O-K-182-0055"}, {"rack": "260", "symbol": "P040015", "index": "O-K-158-0006"}, {"rack": "261", "symbol": "P043616", "index": "O-K-128-0013"}, {"rack": "262", "symbol": "F240904011", "index": "O-K-182-0065"}, {"rack": "263", "symbol": "P040087", "index": "O-K-190-0012"}, {"rack": "264", "symbol": "P039303", "index": "DANHOSS"}, {"rack": "265", "symbol": "P040391", "index": "APLEX"}, {"rack": "266", "symbol": "P040814", "index": "O-K-028-0030"}, {"rack": "267", "symbol": "P041019", "index": "O-K-182-0062"}, {"rack": "268", "symbol": "P040602", "index": "O-K-121-0052"}, {"rack": "269", "symbol": "F240410066", "index": "O-K-182-0059"}, {"rack": "270", "symbol": "P040988", "index": "O-K-121-0055"}, {"rack": "271", "symbol": "P039150", "index": "O-K-244-0007"}, {"rack": "272", "symbol": "F251022023", "index": "O-K-128-0027"}, {"rack": "273", "symbol": "P041021", "index": "O-K-182-0063"}, {"rack": "274", "symbol": "F211208016", "index": "O-K-054-0010"}, {"rack": "275", "symbol": "F240410069", "index": "O-K-182-0061"}, {"rack": "276", "symbol": "F220906037", "index": "O-K-177-0001"}, {"rack": "277", "symbol": "P039151", "index": "O-K-244-0009"}, {"rack": "278", "symbol": "P039433", "index": "O-K-182-0053"}, {"rack": "279", "symbol": "F240429087", "index": "O-K-121-0054"}, {"rack": "280", "symbol": "P043224", "index": "O-K-271-0001"}, {"rack": "281", "symbol": "P043673", "index": "O-K-128-0019"}, {"rack": "282", "symbol": "F231104006", "index": "O-K-015-0011"}, {"rack": "283", "symbol": "P039152", "index": "O-K-244-0006"}, {"rack": "284", "symbol": "P043517", "index": "TREC"}, {"rack": "285", "symbol": "F240326003", "index": "O-K-131-0004"}, {"rack": "286", "symbol": "P044021", "index": "O-K-128-0024"}, {"rack": "287", "symbol": "F240108055", "index": "O-K-182-0054"}, {"rack": "288", "symbol": "P043272", "index": "B-MAR"}, {"rack": "289", "symbol": "P044138", "index": "O-K-128-0033"}, {"rack": "290", "symbol": "F240924073", "index": "O-K-129-0023"}, {"rack": "291", "symbol": "F240902028", "index": "O-K-041-0020"}, {"rack": "292", "symbol": "P041669", "index": "O-K-244-0013"}, {"rack": "293", "symbol": "P039445", "index": "O-K-033-0074"}, {"rack": "294", "symbol": "F231109043", "index": "O-K-054-0007"}, {"rack": "295", "symbol": "P043716", "index": "O-K-128-0017"}, {"rack": "296", "symbol": "F240924072", "index": "O-K-128-0038"}, {"rack": "297", "symbol": "P039934", "index": "O-K-129-0020"}, {"rack": "298", "symbol": "F240910012", "index": "O-K-121-0058"}, {"rack": "299", "symbol": "P039883", "index": "O-K-129-0018"}, {"rack": "300", "symbol": "F240926070", "index": "O-K-173-0016"}, {"rack": "301", "symbol": "P039881", "index": "O-K-129-0017"}, {"rack": "302", "symbol": "F240827049", "index": "O-K-121-0057"}, {"rack": "303", "symbol": "P044693", "index": "O-K-190-0026"}, {"rack": "304", "symbol": "A126022546", "index": "O-K-190-0030"}, {"rack": "305", "symbol": "P044902", "index": "O-K-046-0012"}, {"rack": "306", "symbol": "A126020523", "index": "O-K-128-0043"}, {"rack": "307", "symbol": "P046076", "index": "O-K-128-0048"}, {"rack": "308", "symbol": "P041003", "index": "O-K-182-0070"}, {"rack": "309", "symbol": "A126022853", "index": "O-K-128-0047"}, {"rack": "310", "symbol": "A126022527", "index": "O-K-190-0006"}, {"rack": "311", "symbol": "P046227", "index": "O-K-293-0006"}, {"rack": "312", "symbol": "P046226", "index": "O-K-293-0005"}, {"rack": "313", "symbol": "A126010863", "index": "O-K-046-0010"}, {"rack": "314", "symbol": "P031117", "index": "O-K-184-0011"}, {"rack": "315", "symbol": "P046214", "index": "O-K-121-0083"}, {"rack": "316", "symbol": "P041004", "index": "O-K-182-0071"}, {"rack": "317", "symbol": "P045413", "index": "O-K-128-0040"}, {"rack": "318", "symbol": "P046013", "index": "O-K-041-0030"}, {"rack": "319", "symbol": "A126022849", "index": "O-K-128-0046"}, {"rack": "320", "symbol": "A126013040", "index": "O-K-202-0011"}, {"rack": "321", "symbol": "", "index": ""}, {"rack": "322", "symbol": "", "index": ""}, {"rack": "323", "symbol": "", "index": ""}, {"rack": "324", "symbol": "", "index": ""}, {"rack": "325", "symbol": "", "index": ""}, {"rack": "326", "symbol": "", "index": ""}, {"rack": "327", "symbol": "", "index": ""}, {"rack": "328", "symbol": "", "index": ""}, {"rack": "329", "symbol": "", "index": ""}, {"rack": "330", "symbol": "", "index": ""}, {"rack": "331", "symbol": "", "index": ""}, {"rack": "332", "symbol": "", "index": ""}, {"rack": "333", "symbol": "", "index": ""}, {"rack": "334", "symbol": "", "index": ""}, {"rack": "335", "symbol": "", "index": ""}, {"rack": "336", "symbol": "", "index": ""}, {"rack": "337", "symbol": "", "index": ""}, {"rack": "338", "symbol": "", "index": ""}, {"rack": "339", "symbol": "", "index": ""}, {"rack": "340", "symbol": "", "index": ""}, {"rack": "341", "symbol": "", "index": ""}, {"rack": "342", "symbol": "", "index": ""}, {"rack": "343", "symbol": "", "index": ""}, {"rack": "344", "symbol": "", "index": ""}, {"rack": "345", "symbol": "", "index": ""}, {"rack": "346", "symbol": "", "index": ""}, {"rack": "347", "symbol": "", "index": ""}, {"rack": "348", "symbol": "", "index": ""}, {"rack": "349", "symbol": "", "index": ""}];
+const STORAGE_KEY='lokalna-wyszukiwarka-wykrojnikow-v1';
+let data=[], editId=null, nextId=1;
+const $=id=>document.getElementById(id);
+const clean=v=>(v??'').toString().trim();
+function load(){try{const s=localStorage.getItem(STORAGE_KEY);data=s?JSON.parse(s):initialData.map((r,i)=>({...r,id:i+1}));}catch(e){data=initialData.map((r,i)=>({...r,id:i+1}));}if(!Array.isArray(data))data=[];data=data.map((r,i)=>({id:r.id??i+1,rack:clean(r.rack),symbol:clean(r.symbol),index:clean(r.index)}));nextId=Math.max(0,...data.map(r=>Number(r.id)||0))+1;saveData();}
+function saveData(){localStorage.setItem(STORAGE_KEY,JSON.stringify(data));$('saveState').textContent='Zapisano lokalnie w tej przeglądarce.';}
+function norm(v){return clean(v).toLocaleLowerCase('pl-PL');}
+function render(){const q=norm($('q').value), qi=norm($('qIndex').value), qs=norm($('qSymbol').value), qr=norm($('qRack').value);
+ const list=data.filter(r=>(!q||[r.rack,r.symbol,r.index].some(v=>norm(v).includes(q)))&&(!qi||norm(r.index).includes(qi))&&(!qs||norm(r.symbol).includes(qs))&&(!qr||norm(r.rack).includes(qr))).sort((a,b)=>a.rack.localeCompare(b.rack,undefined,{numeric:true})||a.symbol.localeCompare(b.symbol,undefined,{numeric:true}));
+ $('count').textContent=`Widoczne: ${list.length}`;$('total').textContent=`W bazie: ${data.length}`;
+ $('rows').innerHTML='';if(!list.length){$('rows').innerHTML='<tr><td colspan="4" class="empty">Brak pasujących wykrojników.</td></tr>';return;}
+ for(const r of list){const tr=document.createElement('tr');for(const [v,cls] of [[r.rack,''],[r.symbol,''],[r.index,'index']]){const td=document.createElement('td');td.textContent=v;td.className=cls;tr.appendChild(td);}const td=document.createElement('td');const edit=document.createElement('button');edit.textContent='Edytuj';edit.className='secondary';edit.onclick=()=>openEditor(r.id);const del=document.createElement('button');del.textContent='Usuń';del.className='danger';del.style.marginLeft='6px';del.onclick=()=>{if(confirm('Usunąć wybrany wykrojnik?')){data=data.filter(x=>x.id!==r.id);saveData();render();}};td.append(edit,del);tr.appendChild(td);$('rows').appendChild(tr);}
+}
+function openEditor(id=null){editId=id;const r=id==null?{rack:'',symbol:'',index:''}:data.find(x=>x.id===id);$('editorTitle').textContent=id==null?'Dodaj wykrojnik':'Edytuj wykrojnik';$('fRack').value=r?.rack||'';$('fSymbol').value=r?.symbol||'';$('fIndex').value=r?.index||'';$('editor').classList.remove('hidden');$('editor').scrollIntoView({behavior:'smooth',block:'start'});$('fIndex').focus();}
+$('new').onclick=()=>openEditor();$('cancel').onclick=()=>{$('editor').classList.add('hidden');editId=null;};
+$('save').onclick=()=>{const r={rack:clean($('fRack').value),symbol:clean($('fSymbol').value),index:clean($('fIndex').value)};if(!r.rack&&!r.symbol&&!r.index){alert('Wpisz co najmniej jedną wartość.');return;}if(editId==null)data.push({id:nextId++,...r});else data=data.map(x=>x.id===editId?{...x,...r}:x);saveData();$('editor').classList.add('hidden');editId=null;render();};
+['q','qIndex','qSymbol','qRack'].forEach(id=>$(id).addEventListener('input',render));
+$('clear').onclick=()=>{['q','qIndex','qSymbol','qRack'].forEach(id=>$(id).value='');render();};
+function download(name,content,type){const blob=new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
+function csvCell(v){return '"'+clean(v).replace(/"/g,'""')+'"';}
+$('export').onclick=()=>download('wykrojniki.csv','Nr regału;Symbol;Index\r\n'+data.map(r=>[r.rack,r.symbol,r.index].map(csvCell).join(';')).join('\r\n'),'text/csv;charset=utf-8');
+$('backup').onclick=()=>download('kopia_wykrojnikow.json',JSON.stringify(data,null,2),'application/json;charset=utf-8');
+function parseCSV(text){const first=(text.split(/\r?\n/,1)[0]||'');const delim=(first.match(/;/g)||[]).length>=(first.match(/,/g)||[]).length?';':',';let rows=[],row=[],cell='',quoted=false;for(let i=0;i<text.length;i++){const c=text[i];if(c==='"'&&quoted&&text[i+1]==='"'){cell+='"';i++;}else if(c==='"'){quoted=!quoted;}else if(c===delim&&!quoted){row.push(cell);cell='';}else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&text[i+1]==='\n')i++;row.push(cell);if(row.some(x=>x.trim()))rows.push(row);row=[];cell='';}else cell+=c;}row.push(cell);if(row.some(x=>x.trim()))rows.push(row);return rows;}
+$('importCsv').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const rows=parseCSV(await f.text());if(!rows.length)throw Error('Plik jest pusty.');const hs=rows[0].map(norm);const find=(...terms)=>hs.findIndex(h=>terms.some(t=>h.includes(t)));let ri=find('nr regału','regał','regal'),si=find('symbol'),ii=find('index');if(ri<0&&si<0&&ii<0){ri=0;si=1;ii=2;}const start=(hs.some(h=>h.includes('symbol')||h.includes('index')||h.includes('rega')))?1:0;const incoming=rows.slice(start).map((r,i)=>({id:nextId+i,rack:clean(r[ri]),symbol:clean(r[si]),index:clean(r[ii])})).filter(r=>r.rack||r.symbol||r.index);if(!incoming.length)throw Error('Nie znaleziono rekordów.');if(confirm(`Wczytać ${incoming.length} rekordów i DODAĆ je do obecnej bazy?`)){data.push(...incoming);nextId+=incoming.length;saveData();render();alert('Import zakończony.');}}catch(err){alert('Nie udało się zaimportować CSV: '+err.message);}e.target.value='';};
+$('restoreJson').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const parsed=JSON.parse(await f.text());if(!Array.isArray(parsed))throw Error('Nieprawidłowy plik kopii.');if(confirm('Zastąpić obecną bazę danymi z kopii?')){data=parsed.map((r,i)=>({id:Number(r.id)||i+1,rack:clean(r.rack),symbol:clean(r.symbol),index:clean(r.index)}));nextId=Math.max(0,...data.map(r=>r.id))+1;saveData();render();alert('Kopia przywrócona.');}}catch(err){alert('Nie udało się przywrócić kopii: '+err.message);}e.target.value='';};
+$('reset').onclick=()=>{if(confirm('Przywrócić dane początkowe? Wszystkie lokalne zmiany zostaną utracone.')){data=initialData.map((r,i)=>({...r,id:i+1}));nextId=data.length+1;saveData();render();}};
+load();render();
+</script></body></html>
