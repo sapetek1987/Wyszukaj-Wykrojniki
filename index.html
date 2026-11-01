@@ -16,6 +16,7 @@ input{font:inherit;padding:11px;border:1px solid #cbd6e2;border-radius:9px;backg
 #q{flex:1;min-width:220px}
 button{border:0;border-radius:9px;padding:10px 14px;font-weight:650;cursor:pointer;background:#e8eef5;color:#17324d}
 button.primary{background:#1769aa;color:#fff}
+button.filter-active{background:#1769aa;color:#fff}
 button.edit{background:#fff0c2;color:#725000}
 button.delete{background:#b42318;color:white}
 .stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
@@ -38,7 +39,7 @@ th{position:sticky;top:0;background:#eaf0f6;z-index:1;white-space:nowrap}
 <section class="panel">
  <div class="controls">
   <input id="q" type="search" placeholder="Szukaj: K-33, P042859, O-K-033-0093…" autocomplete="off">
-  <button id="clear" type="button">Wyczyść</button><button id="export" class="primary" type="button">Eksportuj cały spis CSV</button>
+  <button id="clear" type="button">Wyczyść</button><button id="multiOnly" type="button">Pokaż tylko 46 z wieloma indeksami</button><button id="export" class="primary" type="button">Eksportuj cały spis CSV</button>
  </div>
  <div class="stats">
   <div class="stat"><b id="total">0</b><small>Wszystkie wykrojniki</small></div>
@@ -80,6 +81,7 @@ try {
 } catch(e) { console.warn('Nie udało się odczytać zapisanych danych.',e); }
 
 let visible = [];
+let showMultiOnly = false;
 
 function saveData(){
  try {
@@ -96,13 +98,17 @@ function saveData(){
 function search(){
  const raw=$('q').value.trim(), q=norm(raw), cq=clientQ(raw);
  visible=DATA.filter(r=>{
+  if(showMultiOnly && (r.indexes||[]).length<=1) return false;
   const fields=[r.regal,r.klient,r.symbol,...(r.indexes||[])];
   return !q || (cq && norm(r.klient)===norm(cq)) || fields.some(v=>norm(v).includes(q));
  });
  visible.sort((a,b)=>String(a.regal||'').localeCompare(String(b.regal||''),undefined,{numeric:true}) || (a.indexes?.[0]||'').localeCompare(b.indexes?.[0]||''));
  $('total').textContent=DATA.length;
  $('shown').textContent=visible.length;
- $('multi').textContent=DATA.filter(r=>(r.indexes||[]).length>1).length;
+ const multiCount=DATA.filter(r=>(r.indexes||[]).length>1).length;
+ $('multi').textContent=multiCount;
+ $('multiOnly').textContent=showMultiOnly?'Pokaż wszystkie wykrojniki':'Pokaż tylko '+multiCount+' z wieloma indeksami';
+ $('multiOnly').classList.toggle('filter-active',showMultiOnly);
  $('tbody').innerHTML=visible.length ? visible.map(r=>{
   const i=DATA.indexOf(r);
   return `<tr>
@@ -172,7 +178,8 @@ $('tbody').addEventListener('click',e=>{
 });
 
 $('q').addEventListener('input',search);
-$('clear').addEventListener('click',()=>{$('q').value='';search();$('q').focus();});
+$('clear').addEventListener('click',()=>{$('q').value='';showMultiOnly=false;search();$('q').focus();});
+$('multiOnly').addEventListener('click',()=>{$('q').value='';showMultiOnly=!showMultiOnly;search();});
 
 $('export').addEventListener('click',()=>{
  const rows=[['NR Regału','Klient','Symbol','Index','Index cz. 2']];
